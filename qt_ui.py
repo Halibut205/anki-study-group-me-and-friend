@@ -69,29 +69,42 @@ class GoalManager:
         self.goals = cfg.get("goals", {})
 
     def get_status(self, date_obj: datetime, friends_data: list) -> str:
+        """Get status based on daily goal completion.
+        ✓ = completed goal | ✗ = not completed | · = no data
+        """
         date_str = date_obj.strftime("%Y-%m-%d")
-        if not friends_data:
-            return "·"
-        studied = sum(1 for f in friends_data if date_str in f.get("reviews", {}) and f["reviews"][date_str] > 0)
-        pct = (studied / len(friends_data)) * 100 if friends_data else 0
+        daily_goal = self.goals.get("daily", 10)
         
-        if pct >= 100:
+        completed = 0
+        has_data = False
+        
+        for f in friends_data:
+            reviews = f.get("reviews", {})
+            if date_str in reviews and reviews[date_str] > 0:
+                has_data = True
+                if reviews[date_str] >= daily_goal:
+                    completed += 1
+        
+        if not has_data:
+            return "·"
+        
+        # All completed
+        if completed == len(friends_data):
             return "✓"
-        elif pct >= 70:
+        # Some completed
+        elif completed > 0:
             return "◐"
-        elif pct >= 50:
-            return "◑"
         else:
             return "✗"
 
     def get_color(self, status: str) -> str:
         return {
-            "✓": "#3ecf8e",
-            "◐": "#f5a623",
-            "◑": "#ffd700",
-            "✗": "#f87171",
-            "·": "#cccccc",
+            "✓": "#3ecf8e",  # green - all done
+            "◐": "#f5a623",  # amber - some done
+            "✗": "#f87171",  # red - none done
+            "·": "#cccccc",  # gray - no data
         }.get(status, "#888888")
+
 
 
 class SetupWizard(QDialog):
@@ -330,7 +343,7 @@ class CalendarPanel(QWidget):
         lbl.setStyleSheet("font-size: 11px; color: #888888; font-weight: 500;")
         legend.addWidget(lbl)
         
-        for s, l in [("✓", "All"), ("◐", "Most"), ("◑", "Half"), ("✗", "Few")]:
+        for s, l in [("✓", "All done"), ("◐", "Some done"), ("✗", "None done")]:
             c = goal_manager.get_color(s) if goal_manager else "#888888"
             b = QLabel(s)
             b.setStyleSheet(f"color: {c}; font-size: 10px; font-weight: 700;")
