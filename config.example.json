@@ -1,0 +1,9 @@
+{
+  "my_name": "Ban",
+  "my_color": "#378ADD",
+  "repo_path": "/path/to/your/cloned/repo",
+  "goals": {
+    "daily": 10,
+    "weekly": 50
+  }
+}
