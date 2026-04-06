@@ -40,7 +40,7 @@ class GoalManager:
     def save_goals(self, daily: int, weekly: int):
         cfg = mw.addonManager.getConfig(__name__) or {}
         cfg["goals"] = {"daily": daily, "weekly": weekly}
-        mw.addonManager.setConfig(__name__, cfg)
+        mw.addonManager.update_config(cfg)
         self.goals = cfg.get("goals", {})
 
     def get_status(self, date_obj: datetime, friends_data: list) -> str:
@@ -724,7 +724,7 @@ class MainWindow(QDialog):
         cfg["my_name"] = name.strip()
         cfg["my_color"] = color
         cfg["goals"] = {"daily": daily, "weekly": weekly}
-        mw.addonManager.setConfig(__name__, cfg)
+        mw.addonManager.update_config(cfg)
         
         self.goal_manager.save_goals(daily, weekly)
         d.close()
