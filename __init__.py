@@ -24,7 +24,7 @@ def _open_tracker():
     qt_ui.show_tracker_window()
 
 
-action = QAction("Study Tracker 📅", mw)
+action = QAction("Study Tracker", mw)
 qconnect(action.triggered, _open_tracker)
 mw.form.menuTools.addAction(action)
 

@@ -156,7 +156,7 @@ class SetupWizard(QDialog):
         f.addRow("Name:", self.name)
 
         color_layout = QHBoxLayout()
-        self.color_btn = QPushButton("🎨 #378ADD")
+        self.color_btn = QPushButton("#378ADD")
         self.color_btn.setMaximumWidth(120)
         self.color_btn.setStyleSheet("background: #378ADD; color: white; border: none; border-radius: 6px; padding: 6px;")
         self.color_btn.clicked.connect(self._pick_color)
@@ -174,7 +174,7 @@ class SetupWizard(QDialog):
         skip.clicked.connect(self._save_default)
         btn_layout.addWidget(skip)
 
-        save = QPushButton("✓ Save & Continue")
+        save = QPushButton("Save & Continue")
         save.setStyleSheet("""
             QPushButton {
                 background: #7c6af7;
@@ -195,7 +195,7 @@ class SetupWizard(QDialog):
         color = QColorDialog.getColor(initial=initial_color, parent=self)
         if color.isValid():
             self._color = color.name()
-            self.color_btn.setText("🎨 " + self._color)
+            self.color_btn.setText(self._color)
             self.color_btn.setStyleSheet(f"background: {self._color}; color: white; border: none; border-radius: 6px; padding: 6px;")
 
     def _save_default(self):
@@ -612,8 +612,6 @@ class MainWindow(QDialog):
         tl.setContentsMargins(28, 18, 28, 18)
         tl.setSpacing(14)
 
-        tl.addWidget(QLabel("📅"))
-
         tit = QVBoxLayout()
         tit.setContentsMargins(0, 0, 0, 0)
         tit.setSpacing(1)
@@ -629,7 +627,7 @@ class MainWindow(QDialog):
         # Show goals
         daily_goal = self.goal_manager.goals.get("daily", 60)
         weekly_goal = self.goal_manager.goals.get("weekly", 420)
-        goals_text = QLabel(f"📊 Daily: {daily_goal} | Weekly: {weekly_goal}")
+        goals_text = QLabel(f"Daily: {daily_goal} | Weekly: {weekly_goal}")
         goals_text.setStyleSheet("font-size: 11px; color: #7c6af7; font-weight: 500;")
         tit.addWidget(goals_text)
         
@@ -637,7 +635,7 @@ class MainWindow(QDialog):
 
         tl.addStretch()
 
-        self.sync_btn = QPushButton("↻ Sync")
+        self.sync_btn = QPushButton("Sync")
         self.sync_btn.setStyleSheet("""
             QPushButton {
                 background: #7c6af7;
@@ -653,8 +651,7 @@ class MainWindow(QDialog):
         self.sync_btn.clicked.connect(self._sync)
         tl.addWidget(self.sync_btn)
 
-        set_btn = QPushButton("⚙️")
-        set_btn.setMaximumWidth(40)
+        set_btn = QPushButton("Settings")
         set_btn.setStyleSheet("""
             QPushButton {
                 background: #f0f0f0;
