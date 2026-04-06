@@ -1,8 +1,4 @@
 {
   "my_name": "Ban",
-  "my_color": "#378ADD",
-  "goals": {
-    "daily": 10,
-    "weekly": 50
-  }
+  "my_color": "#378ADD"
 }

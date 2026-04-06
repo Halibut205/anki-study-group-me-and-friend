@@ -53,20 +53,33 @@ class SyncWorker(QThread):
 
 
 class GoalManager:
-    """Manage study goals."""
+    """Manage study goals (shared across all users)."""
 
     def __init__(self):
         self.goals = self._load_goals()
 
     def _load_goals(self) -> dict:
-        cfg = mw.addonManager.getConfig(__name__) or {}
-        return cfg.get("goals", {"daily": 10, "weekly": 50})
+        """Load goals from shared goals.json file."""
+        addon_dir = os.path.dirname(__file__)
+        goals_path = os.path.join(addon_dir, "goals.json")
+        try:
+            if os.path.exists(goals_path):
+                with open(goals_path, "r") as f:
+                    return json.load(f)
+        except Exception as e:
+            print(f"Error loading goals: {e}")
+        return {"daily": 10, "weekly": 50}
 
     def save_goals(self, daily: int, weekly: int):
-        cfg = mw.addonManager.getConfig(__name__) or {}
-        cfg["goals"] = {"daily": daily, "weekly": weekly}
-        _save_config(cfg)
-        self.goals = cfg.get("goals", {})
+        """Save goals to shared goals.json file."""
+        addon_dir = os.path.dirname(__file__)
+        goals_path = os.path.join(addon_dir, "goals.json")
+        try:
+            with open(goals_path, "w") as f:
+                json.dump({"daily": daily, "weekly": weekly}, f, indent=2)
+            self.goals = {"daily": daily, "weekly": weekly}
+        except Exception as e:
+            print(f"Error saving goals: {e}")
 
     def get_status(self, date_obj: datetime, friends_data: list) -> str:
         """Get status based on daily goal completion.
@@ -188,8 +201,7 @@ class SetupWizard(QDialog):
     def _save_default(self):
         cfg = {
             "my_name": "Ban",
-            "my_color": "#378ADD",
-            "goals": {"daily": 10, "weekly": 50}
+            "my_color": "#378ADD"
         }
         _save_config(cfg)
         self.accept()
@@ -202,8 +214,7 @@ class SetupWizard(QDialog):
 
         cfg = {
             "my_name": name,
-            "my_color": self._color,
-            "goals": {"daily": 10, "weekly": 50}
+            "my_color": self._color
         }
         _save_config(cfg)
         self.accept()
@@ -866,12 +877,12 @@ class MainWindow(QDialog):
             QMessageBox.warning(self, "Error", "Name cannot be empty!")
             return
         
-        cfg = mw.addonManager.getConfig(__name__) or {}
+        cfg = _load_config() or {}
         cfg["my_name"] = name.strip()
         cfg["my_color"] = color
-        cfg["goals"] = {"daily": daily, "weekly": weekly}
         _save_config(cfg)
         
+        # Save shared goals
         self.goal_manager.save_goals(daily, weekly)
         d.close()
         
