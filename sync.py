@@ -44,7 +44,14 @@ def push_my_data() -> tuple[bool, str]:
     if not os.path.isdir(repo):
         return False, f"Directory not found: {repo}"
 
-    cfg = _cfg()
+    # Load config from config.json
+    config_path = os.path.join(repo, "config.json")
+    try:
+        with open(config_path, "r") as f:
+            cfg = json.load(f)
+    except Exception as e:
+        return False, f"Cannot read config.json: {e}"
+    
     name: str = cfg.get("my_name", "").strip()
     if not name:
         return False, "my_name not set in config"
