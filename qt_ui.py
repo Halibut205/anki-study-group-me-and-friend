@@ -47,6 +47,11 @@ class SyncWorker(QThread):
     """Background worker for git sync."""
     finished = pyqtSignal(bool, str)
 
+    def __init__(self):
+        super().__init__()
+        self.spinner_frames = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"]
+        self.frame = 0
+
     def run(self):
         ok, msg = sync.push_my_data()
         self.finished.emit(ok, msg)
@@ -887,7 +892,8 @@ class MainWindow(QDialog):
 
     def _sync(self):
         self.sync_btn.setEnabled(False)
-        self.status.setText("Syncing...")
+        self.sync_btn.setText("Syncing...")
+        self.status.setText("Syncing with GitHub...")
 
         self.sync_worker = SyncWorker()
         self.sync_worker.finished.connect(self._sync_done)
@@ -895,9 +901,13 @@ class MainWindow(QDialog):
 
     def _sync_done(self, ok: bool, msg: str):
         self.sync_btn.setEnabled(True)
-        self.status.setText(f"Synced: {msg}" if ok else f"Failed: {msg}")
+        self.sync_btn.setText("Sync")
+        
         if ok:
+            self.status.setText(f"Synced successfully: {msg}")
             self._load()
+        else:
+            self.status.setText(f"Sync failed: {msg}")
 
 
 def show_tracker_window():
