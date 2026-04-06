@@ -625,6 +625,14 @@ class MainWindow(QDialog):
         sub = QLabel(f"{cfg.get('my_name', 'Me')}")
         sub.setStyleSheet("font-size: 12px; color: #888888; font-family: 'Courier New';")
         tit.addWidget(sub)
+        
+        # Show goals
+        daily_goal = self.goal_manager.goals.get("daily", 60)
+        weekly_goal = self.goal_manager.goals.get("weekly", 420)
+        goals_text = QLabel(f"📊 Daily: {daily_goal} | Weekly: {weekly_goal}")
+        goals_text.setStyleSheet("font-size: 11px; color: #7c6af7; font-weight: 500;")
+        tit.addWidget(goals_text)
+        
         tl.addLayout(tit)
 
         tl.addStretch()
