@@ -13,7 +13,7 @@ from aqt.qt import (
     QDialog, QVBoxLayout, QHBoxLayout, QWidget, QPushButton, QLabel,
     QGridLayout, QScrollArea, QFrame, Qt, QMessageBox,
     QThread, pyqtSignal, QSpinBox, QFormLayout, QLineEdit,
-    QColorDialog, QTabWidget, QListWidget, QListWidgetItem
+    QColorDialog, QTabWidget, QListWidget, QListWidgetItem, QColor
 )
 
 from . import sync, tracker
@@ -178,7 +178,8 @@ class SetupWizard(QDialog):
         l.addLayout(btn_layout)
 
     def _pick_color(self):
-        color = QColorDialog.getColor(initial=self._color, parent=self)
+        initial_color = QColor(self._color)
+        color = QColorDialog.getColor(initial=initial_color, parent=self)
         if color.isValid():
             self._color = color.name()
             self.color_btn.setText("🎨 " + self._color)
@@ -891,7 +892,8 @@ class MainWindow(QDialog):
 
     def _pick_color(self, btn):
         cfg = mw.addonManager.getConfig(__name__) or {}
-        color = QColorDialog.getColor(initial=cfg.get("my_color", "#378ADD"), parent=self)
+        initial_color = QColor(cfg.get("my_color", "#378ADD"))
+        color = QColorDialog.getColor(initial=initial_color, parent=self)
         if color.isValid():
             hex_color = color.name()
             btn.setText("🎨 " + hex_color)
