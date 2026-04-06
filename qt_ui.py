@@ -20,7 +20,7 @@ from . import sync, tracker
 
 
 def _save_config(cfg: dict):
-    """Save config directly to config.json file."""
+    """Save config to root config.json file (gitignored, local only)."""
     addon_dir = os.path.dirname(__file__)
     config_path = os.path.join(addon_dir, "config.json")
     try:
@@ -31,7 +31,7 @@ def _save_config(cfg: dict):
 
 
 def _load_config() -> dict:
-    """Load config from config.json file."""
+    """Load config from root config.json file."""
     addon_dir = os.path.dirname(__file__)
     config_path = os.path.join(addon_dir, "config.json")
     try:
@@ -64,7 +64,7 @@ class GoalManager:
         self.goals = self._load_goals()
 
     def _load_goals(self) -> dict:
-        """Load goals from shared goals.json file."""
+        """Load goals from shared goals.json file (at addon root)."""
         addon_dir = os.path.dirname(__file__)
         goals_path = os.path.join(addon_dir, "goals.json")
         try:
@@ -76,7 +76,7 @@ class GoalManager:
         return {"daily": 10, "weekly": 50}
 
     def save_goals(self, daily: int, weekly: int):
-        """Save goals to shared goals.json file."""
+        """Save goals to shared goals.json file (at addon root)."""
         addon_dir = os.path.dirname(__file__)
         goals_path = os.path.join(addon_dir, "goals.json")
         try:

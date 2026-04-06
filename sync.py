@@ -14,6 +14,14 @@ def _addon_dir() -> str:
     return os.path.dirname(__file__)
 
 
+def _get_user_dir(username: str) -> str:
+    """Get the user directory path for shared data."""
+    addon_dir = _addon_dir()
+    user_dir = os.path.join(addon_dir, "User", username.lower().replace(" ", "_"))
+    os.makedirs(user_dir, exist_ok=True)
+    return user_dir
+
+
 def _git(repo: str, *args, timeout: int = 20) -> tuple[bool, str]:
     try:
         r = subprocess.run(
@@ -36,7 +44,7 @@ def _git(repo: str, *args, timeout: int = 20) -> tuple[bool, str]:
 def push_my_data() -> tuple[bool, str]:
     """
     1. git pull --rebase
-    2. Write / overwrite our own JSON file
+    2. Write / overwrite our own JSON file to User/{username}/
     3. git add + commit + push
     Returns (success, message).
     """
@@ -44,7 +52,7 @@ def push_my_data() -> tuple[bool, str]:
     if not os.path.isdir(repo):
         return False, f"Directory not found: {repo}"
 
-    # Load config from config.json
+    # Load config from root config.json (gitignored, local only)
     config_path = os.path.join(repo, "config.json")
     try:
         with open(config_path, "r") as f:
@@ -62,7 +70,8 @@ def push_my_data() -> tuple[bool, str]:
         # non-fatal – repo might be offline; we'll still write + try push
         pass
 
-    # Write data
+    # Write data to User/{username}/{username}.json
+    user_dir = _get_user_dir(name)
     data = {
         "name": name,
         "color": cfg.get("my_color", "#378ADD"),
@@ -70,12 +79,13 @@ def push_my_data() -> tuple[bool, str]:
         "last_updated": time.strftime("%Y-%m-%dT%H:%M:%S"),
     }
     safe_name = name.lower().replace(" ", "_")
-    file_path = os.path.join(repo, f"{safe_name}.json")
+    file_path = os.path.join(user_dir, f"{safe_name}.json")
     with open(file_path, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
 
-    # Commit
-    _git(repo, "add", f"{safe_name}.json")
+    # Commit the user file
+    relative_path = os.path.relpath(file_path, repo)
+    _git(repo, "add", relative_path)
     commit_msg = f"update {name} {time.strftime('%Y-%m-%d %H:%M')}"
     ok, err = _git(repo, "commit", "-m", commit_msg)
     if not ok and "nothing to commit" not in err:
@@ -91,7 +101,7 @@ def push_my_data() -> tuple[bool, str]:
 
 def pull_all_data() -> list[dict]:
     """
-    git pull, then read all *.json files in the repo root.
+    git pull, then read all *.json files in User/{username}/ directories.
     Returns list of friend data dicts.
     """
     repo = _addon_dir()
@@ -101,14 +111,25 @@ def pull_all_data() -> list[dict]:
     _git(repo, "pull", "--rebase", "origin", "main")
 
     result = []
-    for fname in sorted(os.listdir(repo)):
-        if not fname.endswith(".json"):
+    user_dir = os.path.join(repo, "User")
+    if not os.path.isdir(user_dir):
+        return result
+
+    # Read all user directories
+    for username in sorted(os.listdir(user_dir)):
+        user_path = os.path.join(user_dir, username)
+        if not os.path.isdir(user_path):
             continue
-        try:
-            with open(os.path.join(repo, fname), encoding="utf-8") as f:
-                obj = json.load(f)
-            if "name" in obj and "reviews" in obj:
-                result.append(obj)
-        except Exception:
-            pass
+        
+        # Read {username}.json from User/{username}/
+        for fname in os.listdir(user_path):
+            if not fname.endswith(".json") or fname == "config.json":
+                continue
+            try:
+                with open(os.path.join(user_path, fname), encoding="utf-8") as f:
+                    obj = json.load(f)
+                if "name" in obj and "reviews" in obj:
+                    result.append(obj)
+            except Exception:
+                pass
     return result
