@@ -36,7 +36,7 @@ class DayCell(QFrame):
         self.friends_data = friends_data
         self.selected = False
 
-        self.setFrameShape(QFrame.StyledPanel)
+        self.setFrameShape(QFrame.Shape.StyledPanel)
         self.setStyleSheet("""
             QFrame {
                 border: 1px solid rgba(255,255,255,0.07);
@@ -360,7 +360,7 @@ class DetailPanel(QWidget):
 
         # Divider
         divider = QFrame()
-        divider.setFrameShape(QFrame.HLine)
+        divider.setFrameShape(QFrame.Shape.HLine)
         divider.setStyleSheet("color: rgba(255,255,255,0.07);")
         layout.addWidget(divider)
 
