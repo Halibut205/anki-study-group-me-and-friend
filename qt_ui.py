@@ -39,17 +39,15 @@ class DayCell(QFrame):
         self.setFrameShape(QFrame.Shape.StyledPanel)
         self.setStyleSheet("""
             QFrame {
-                border: 1px solid rgba(255,255,255,0.07);
+                border: 1px solid rgba(0,0,0,0.1);
                 border-radius: 12px;
-                background: #18181f;
+                background: #ffffff;
             }
             QFrame:hover {
-                border-color: rgba(255,255,255,0.14);
-                background: #22222c;
+                border-color: rgba(0,0,0,0.15);
+                background: #f5f5f5;
             }
         """)
-
-        layout = QVBoxLayout(self)
         layout.setContentsMargins(8, 8, 8, 7)
         layout.setSpacing(4)
 
@@ -57,7 +55,7 @@ class DayCell(QFrame):
             # Date number
             day_label = QLabel(str(date_obj.day))
             day_label.setStyleSheet("""
-                color: #9090a8;
+                color: #666666;
                 font-size: 12px;
                 font-weight: 500;
                 font-family: 'Courier New', monospace;
@@ -121,22 +119,22 @@ class DayCell(QFrame):
         if selected:
             self.setStyleSheet("""
                 QFrame {
-                    border: 1px solid #a594f9;
+                    border: 1px solid #7c6af7;
                     border-radius: 12px;
-                    background: #22222c;
-                    box-shadow: 0 0 0 1px #a594f9;
+                    background: #f5f5f5;
+                    box-shadow: 0 0 0 1px #7c6af7;
                 }
             """)
         else:
             self.setStyleSheet("""
                 QFrame {
-                    border: 1px solid rgba(255,255,255,0.07);
+                    border: 1px solid rgba(0,0,0,0.1);
                     border-radius: 12px;
-                    background: #18181f;
+                    background: #ffffff;
                 }
                 QFrame:hover {
-                    border-color: rgba(255,255,255,0.14);
-                    background: #22222c;
+                    border-color: rgba(0,0,0,0.15);
+                    background: #f5f5f5;
                 }
             """)
 
@@ -193,7 +191,7 @@ class CalendarPanel(QWidget):
             hdr = QLabel(day)
             hdr.setAlignment(Qt.AlignmentFlag.AlignCenter)
             hdr.setStyleSheet("""
-                color: #55556a;
+                color: #888888;
                 font-size: 11px;
                 font-weight: 500;
                 text-transform: uppercase;
@@ -281,7 +279,7 @@ class DetailPanel(QWidget):
 
         self.empty_label = QLabel("선택된 날짜가 없습니다")
         self.empty_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.empty_label.setStyleSheet("color: #55556a; font-size: 13px;")
+        self.empty_label.setStyleSheet("color: #999999; font-size: 13px;")
 
         layout.addSpacing(24)
         layout.addWidget(self.empty_label)
@@ -290,8 +288,8 @@ class DetailPanel(QWidget):
         self.setMinimumWidth(280)
         self.setStyleSheet("""
             QWidget {
-                border-left: 1px solid rgba(255,255,255,0.07);
-                background: #18181f;
+                border-left: 1px solid rgba(0,0,0,0.1);
+                background: #fafafa;
             }
         """)
 
@@ -314,11 +312,11 @@ class DetailPanel(QWidget):
         weekday_str = date_obj.strftime("%A")
 
         date_label = QLabel(date_str)
-        date_label.setStyleSheet("font-size: 13px; font-weight: 600; color: #e8e8f0;")
+        date_label.setStyleSheet("font-size: 13px; font-weight: 600; color: #000000;")
         layout.addWidget(date_label)
 
         weekday_label = QLabel(weekday_str)
-        weekday_label.setStyleSheet("font-size: 11px; color: #55556a; margin-top: 2px;")
+        weekday_label.setStyleSheet("font-size: 11px; color: #888888; margin-top: 2px;")
         layout.addWidget(weekday_label)
 
         layout.addSpacing(12)
@@ -332,25 +330,25 @@ class DetailPanel(QWidget):
         stats_layout.setSpacing(8)
 
         stat1 = QFrame()
-        stat1.setStyleSheet("background: #22222c; border-radius: 8px; padding: 8px 10px;")
+        stat1.setStyleSheet("background: #f0f0f0; border-radius: 8px; padding: 8px 10px;")
         stat1_layout = QVBoxLayout(stat1)
         stat1_layout.setContentsMargins(8, 8, 8, 8)
         stat1_val = QLabel(str(studied_today))
-        stat1_val.setStyleSheet("font-size: 18px; font-weight: 600; color: #e8e8f0; font-family: 'Courier New';")
+        stat1_val.setStyleSheet("font-size: 18px; font-weight: 600; color: #000000; font-family: 'Courier New';")
         stat1_key = QLabel("STUDIED")
-        stat1_key.setStyleSheet("font-size: 10px; color: #55556a; margin-top: 2px; text-transform: uppercase;")
+        stat1_key.setStyleSheet("font-size: 10px; color: #888888; margin-top: 2px; text-transform: uppercase;")
         stat1_layout.addWidget(stat1_val)
         stat1_layout.addWidget(stat1_key)
         stats_layout.addWidget(stat1)
 
         stat2 = QFrame()
-        stat2.setStyleSheet("background: #22222c; border-radius: 8px; padding: 8px 10px;")
+        stat2.setStyleSheet("background: #f0f0f0; border-radius: 8px; padding: 8px 10px;")
         stat2_layout = QVBoxLayout(stat2)
         stat2_layout.setContentsMargins(8, 8, 8, 8)
         stat2_val = QLabel(str(total_friends))
-        stat2_val.setStyleSheet("font-size: 18px; font-weight: 600; color: #e8e8f0; font-family: 'Courier New';")
+        stat2_val.setStyleSheet("font-size: 18px; font-weight: 600; color: #000000; font-family: 'Courier New';")
         stat2_key = QLabel("GROUP")
-        stat2_key.setStyleSheet("font-size: 10px; color: #55556a; margin-top: 2px; text-transform: uppercase;")
+        stat2_key.setStyleSheet("font-size: 10px; color: #888888; margin-top: 2px; text-transform: uppercase;")
         stat2_layout.addWidget(stat2_val)
         stat2_layout.addWidget(stat2_key)
         stats_layout.addWidget(stat2)
@@ -361,7 +359,7 @@ class DetailPanel(QWidget):
         # Divider
         divider = QFrame()
         divider.setFrameShape(QFrame.Shape.HLine)
-        divider.setStyleSheet("color: rgba(255,255,255,0.07);")
+        divider.setStyleSheet("color: rgba(0,0,0,0.1);")
         layout.addWidget(divider)
 
         # Friend list
@@ -390,10 +388,10 @@ class DetailPanel(QWidget):
         row_widget.setStyleSheet("""
             QWidget {
                 background: transparent;
-                border-bottom: 1px solid rgba(255,255,255,0.07);
+                border-bottom: 1px solid rgba(0,0,0,0.08);
                 padding: 10px 0;
             }
-            QWidget:hover { background: #22222c; }
+            QWidget:hover { background: #f5f5f5; }
         """)
 
         row_layout = QHBoxLayout(row_widget)
@@ -422,19 +420,19 @@ class DetailPanel(QWidget):
         info_layout.setSpacing(2)
 
         name_label = QLabel(friend.get("name", "Unknown"))
-        name_label.setStyleSheet("font-size: 13px; font-weight: 500; color: #e8e8f0;")
+        name_label.setStyleSheet("font-size: 13px; font-weight: 500; color: #000000;")
         info_layout.addWidget(name_label)
 
         reviews = friend.get("reviews", {}).get(date_str, 0)
         count_label = QLabel(f"{reviews} cards" if reviews > 0 else "—")
-        count_label.setStyleSheet("font-size: 11px; color: #9090a8; font-family: 'Courier New';")
+        count_label.setStyleSheet("font-size: 11px; color: #888888; font-family: 'Courier New';")
         info_layout.addWidget(count_label)
 
         row_layout.addLayout(info_layout)
 
         # Badge
         badge_text = "Done" if reviews > 0 else "Miss"
-        badge_color = "background: rgba(62,207,142,0.15); color: #3ecf8e;" if reviews > 0 else "background: rgba(255,255,255,0.05); color: #55556a;"
+        badge_color = "background: rgba(62,207,142,0.15); color: #3ecf8e;" if reviews > 0 else "background: rgba(0,0,0,0.05); color: #999999;"
         badge = QLabel(badge_text)
         badge.setStyleSheet(f"""
             font-size: 10px;
@@ -467,7 +465,7 @@ class TrackerWindowQt(QDialog):
 
         # Top bar
         topbar = QWidget()
-        topbar.setStyleSheet("background: #18181f; border-bottom: 1px solid rgba(255,255,255,0.07);")
+        topbar.setStyleSheet("background: #ffffff; border-bottom: 1px solid rgba(0,0,0,0.1);")
         topbar_layout = QHBoxLayout(topbar)
         topbar_layout.setContentsMargins(28, 18, 28, 18)
         topbar_layout.setSpacing(14)
@@ -480,10 +478,10 @@ class TrackerWindowQt(QDialog):
         title_layout.setContentsMargins(0, 0, 0, 0)
         title_layout.setSpacing(1)
         title_label = QLabel("Study Tracker")
-        title_label.setStyleSheet("font-size: 15px; font-weight: 600; color: #e8e8f0;")
+        title_label.setStyleSheet("font-size: 15px; font-weight: 600; color: #000000;")
         title_layout.addWidget(title_label)
         subtitle_label = QLabel("group.json")
-        subtitle_label.setStyleSheet("font-size: 12px; color: #9090a8; font-family: 'Courier New';")
+        subtitle_label.setStyleSheet("font-size: 12px; color: #888888; font-family: 'Courier New';")
         title_layout.addWidget(subtitle_label)
         topbar_layout.addLayout(title_layout)
 
@@ -510,12 +508,12 @@ class TrackerWindowQt(QDialog):
 
         # Legend bar
         legend_bar = QWidget()
-        legend_bar.setStyleSheet("background: #18181f; border-bottom: 1px solid rgba(255,255,255,0.07); padding: 12px 28px;")
+        legend_bar.setStyleSheet("background: #fafafa; border-bottom: 1px solid rgba(0,0,0,0.08); padding: 12px 28px;")
         legend_layout = QHBoxLayout(legend_bar)
         legend_layout.setContentsMargins(0, 0, 0, 0)
         legend_layout.setSpacing(6)
         legend_label = QLabel("MEMBERS")
-        legend_label.setStyleSheet("font-size: 11px; color: #55556a; text-transform: uppercase;")
+        legend_label.setStyleSheet("font-size: 11px; color: #888888; text-transform: uppercase;")
         legend_layout.addWidget(legend_label)
         legend_layout.addStretch()
         main_layout.addWidget(legend_bar)
@@ -539,11 +537,11 @@ class TrackerWindowQt(QDialog):
         self.status_bar = QLabel("Ready")
         self.status_bar.setStyleSheet("""
             QLabel {
-                background: #18181f;
-                border-top: 1px solid rgba(255,255,255,0.07);
+                background: #fafafa;
+                border-top: 1px solid rgba(0,0,0,0.08);
                 padding: 10px 28px;
                 font-size: 11px;
-                color: #55556a;
+                color: #888888;
                 font-family: 'Courier New';
             }
         """)
