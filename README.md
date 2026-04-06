@@ -10,29 +10,16 @@ git clone https://github.com/Halibut205/anki-study-group-me-and-friend.git
 cd anki-study-group-me-and-friend
 ```
 
-### 2️⃣ Setup Config (First Time Only)
-```bash
-# Copy template config
-cp config.example.json config.json
-
-# Edit config.json with your info
-nano config.json
-```
-
-Chỉnh sửa các fields:
-- `"my_name": "Ban"` → Đổi thành tên của bạn
-- `"my_color": "#378ADD"` → Chọn màu hex (ví dụ: `#FF6B6B`, `#4ECDC4`)
-- `"repo_path": "/path/to/your/cloned/repo"` → Đường dẫn đến thư mục vừa clone
-
-### 3️⃣ Trong Anki
+### 2️⃣ First Time in Anki
 - Mở Anki
 - Vào **Tools → Study Tracker 📅**
-- Nhấn **⚙️** để mở Settings
-- Kiểm tra Profile tab (Name, Color, Repo Path)
-- Nhấn **💾 Save** khi chắc chắn
+- **Setup Wizard** sẽ popup
+- Nhập tên + chọn màu
+- Nhấn **✓ Save & Continue**
+- Xong! Calendar sẽ hiển thị
 
-### 4️⃣ Sync
-- Mỗi khi nhấn **↻ Sync** trong Study Tracker, data của bạn tự động push lên GitHub
+### 3️⃣ Sync
+- Mỗi lần nhấn **↻ Sync** trong Study Tracker, data của bạn tự động push lên GitHub
 - Data của bạn bè sẽ được pull về để hiển thị trên calendar
 
 ---
@@ -43,7 +30,6 @@ Chỉnh sửa các fields:
 |-------|---------|-------|
 | `my_name` | Tên hiển thị trên calendar | `"Ban"`, `"Linh"` |
 | `my_color` | Màu avatar (hex code) | `"#378ADD"`, `"#FF6B6B"` |
-| `repo_path` | Đường dẫn đến repo trên máy | `/home/user/anki-study-group` |
 | `goals.daily` | Mục tiêu số cards mỗi ngày | `10` |
 | `goals.weekly` | Mục tiêu số cards mỗi tuần | `50` |
 
@@ -70,12 +56,17 @@ Hoặc dùng UI: Settings → Profile → nhấn **🎨** để chọn màu
 
 ## 📊 Hiểu Cách Hoạt Động
 
-### Calendar Indicators
-- **✓** (xanh) = Tất cả mọi người đã học
-- **◐** (cam) = Hầu hết mọi người đã học (70%+)
-- **◑** (vàng) = Khoảng nửa mọi người học (50%+)
-- **✗** (đỏ) = Ít người học (<50%)
+### Calendar Indicators (Dựa trên Daily Goal)
+- **✓** (xanh) = Tất cả mọi người đã hoàn thành daily goal hôm nay
+- **◐** (cam) = Một số người đã hoàn thành daily goal
+- **✗** (đỏ) = Không ai hoàn thành daily goal
 - **·** (xám) = Chưa có ai học
+
+### Ví Dụ
+Daily goal = 10 cards
+- Bạn A học 12 cards → ✓ Hoàn thành
+- Bạn B học 5 cards → ✗ Chưa hoàn thành
+- Hôm đó hiển thị: **◐** (một số hoàn thành)
 
 ### Files Structure
 ```
@@ -91,10 +82,6 @@ Hoặc dùng UI: Settings → Profile → nhấn **🎨** để chọn màu
 ---
 
 ## 🐛 Troubleshooting
-
-### Repo path không tìm được
-- Kiểm tra đường dẫn có đúng không
-- Thử dùng absolute path (ví dụ: `/home/user/anki-study-group`, không phải `~/anki-study-group`)
 
 ### Sync không hoạt động
 - Kiểm tra git config: `git config user.name` và `git config user.email`
