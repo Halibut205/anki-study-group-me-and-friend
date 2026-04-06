@@ -9,12 +9,9 @@ from . import tracker
 
 # ── helpers ──────────────────────────────────────────────────────────────────
 
-def _cfg() -> dict:
-    return mw.addonManager.getConfig(__name__) or {}
-
-
-def _repo() -> str:
-    return _cfg().get("repo_path", "").strip()
+def _addon_dir() -> str:
+    """Get the addon directory (which is the git repo)."""
+    return os.path.dirname(__file__)
 
 
 def _git(repo: str, *args, timeout: int = 20) -> tuple[bool, str]:
@@ -43,9 +40,7 @@ def push_my_data() -> tuple[bool, str]:
     3. git add + commit + push
     Returns (success, message).
     """
-    repo = _repo()
-    if not repo:
-        return False, "repo_path not set in config"
+    repo = _addon_dir()
     if not os.path.isdir(repo):
         return False, f"Directory not found: {repo}"
 
@@ -92,8 +87,8 @@ def pull_all_data() -> list[dict]:
     git pull, then read all *.json files in the repo root.
     Returns list of friend data dicts.
     """
-    repo = _repo()
-    if not repo or not os.path.isdir(repo):
+    repo = _addon_dir()
+    if not os.path.isdir(repo):
         return []
 
     _git(repo, "pull", "--rebase", "origin", "main")

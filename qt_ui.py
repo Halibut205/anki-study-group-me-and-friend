@@ -100,7 +100,7 @@ class SetupWizard(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle("Study Tracker - First Time Setup")
-        self.resize(500, 350)
+        self.resize(450, 280)
         self._color = "#378ADD"
 
         l = QVBoxLayout(self)
@@ -137,10 +137,6 @@ class SetupWizard(QDialog):
         color_layout.addWidget(self.color_btn)
         color_layout.addStretch()
         f.addRow("Color:", color_layout)
-
-        self.repo_path = QLineEdit()
-        self.repo_path.setPlaceholderText("/path/to/your/cloned/repo")
-        f.addRow("Repo Path:", self.repo_path)
 
         l.addLayout(f)
         l.addStretch()
@@ -179,7 +175,6 @@ class SetupWizard(QDialog):
         cfg = {
             "my_name": "Ban",
             "my_color": "#378ADD",
-            "repo_path": "",
             "goals": {"daily": 10, "weekly": 50}
         }
         _save_config(cfg)
@@ -194,7 +189,6 @@ class SetupWizard(QDialog):
         cfg = {
             "my_name": name,
             "my_color": self._color,
-            "repo_path": self.repo_path.text().strip(),
             "goals": {"daily": 10, "weekly": 50}
         }
         _save_config(cfg)
@@ -735,11 +729,6 @@ class MainWindow(QDialog):
         self.user_color.clicked.connect(lambda: self._pick_color(self.user_color))
         uf.addRow("Color:", self.user_color)
 
-        self.repo_path = QLineEdit()
-        self.repo_path.setText(cfg.get("repo_path", ""))
-        self.repo_path.setPlaceholderText("/path/to/your/cloned/repo")
-        uf.addRow("Repo Path:", self.repo_path)
-
         upl.addLayout(uf)
         upl.addStretch()
         tabs.addTab(upt, "🧑 Profile")
@@ -851,14 +840,14 @@ class MainWindow(QDialog):
             }
             QPushButton:hover { opacity: 0.85; }
         """)
-        sv.clicked.connect(lambda: self._save(self.user_name.text(), self._color, self.repo_path.text(), ds.value(), ws.value(), d))
+        sv.clicked.connect(lambda: self._save(self.user_name.text(), self._color, ds.value(), ws.value(), d))
         btn_layout.addStretch()
         btn_layout.addWidget(sv)
         l.addLayout(btn_layout)
 
         d.exec()
 
-    def _save(self, name, color, repo_path, daily, weekly, d):
+    def _save(self, name, color, daily, weekly, d):
         if not name.strip():
             QMessageBox.warning(self, "Error", "Name cannot be empty!")
             return
@@ -866,7 +855,6 @@ class MainWindow(QDialog):
         cfg = mw.addonManager.getConfig(__name__) or {}
         cfg["my_name"] = name.strip()
         cfg["my_color"] = color
-        cfg["repo_path"] = repo_path.strip()
         cfg["goals"] = {"daily": daily, "weekly": weekly}
         _save_config(cfg)
         
