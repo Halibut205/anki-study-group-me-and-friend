@@ -86,34 +86,36 @@ class GoalManager:
         except Exception as e:
             print(f"Error saving goals: {e}")
 
-    def get_status(self, date_obj: datetime, friends_data: list) -> str:
-        """Get status based on daily goal completion.
-        ✓ = completed goal | ✗ = not completed | · = no data
+    def get_status(self, date_obj: datetime, friend_data: dict) -> str:
+        """Get status for individual person based on daily goal completion.
+        ✓ = completed daily goal | ◐ = studied but not goal | ✗ = not studied
         """
         date_str = date_obj.strftime("%Y-%m-%d")
-        daily_goal = self.goals.get("daily", 10)
+        daily_goal = self.goals.get("daily", 60)
         
-        completed = 0
-        has_data = False
+        reviews = friend_data.get("reviews", {})
+        cards_studied = reviews.get(date_str, 0)
         
-        for f in friends_data:
-            reviews = f.get("reviews", {})
-            if date_str in reviews and reviews[date_str] > 0:
-                has_data = True
-                if reviews[date_str] >= daily_goal:
-                    completed += 1
-        
-        if not has_data:
-            return "·"
-        
-        # All completed
-        if completed == len(friends_data):
-            return "✓"
-        # Some completed
-        elif completed > 0:
-            return "◐"
+        if cards_studied == 0:
+            return "✗"  # None done
+        elif cards_studied >= daily_goal:
+            return "✓"  # All done
         else:
+            return "◐"  # Some done
+
+    def get_calendar_status(self, date_obj: datetime, friends_data: list) -> str:
+        """Get status for calendar day (any of friends studied)."""
+        date_str = date_obj.strftime("%Y-%m-%d")
+        
+        studied = sum(1 for f in friends_data if date_str in f.get("reviews", {}) and f["reviews"][date_str] > 0)
+        total = len(friends_data)
+        
+        if studied == 0:
             return "✗"
+        elif studied == total:
+            return "✓"
+        else:
+            return "◐"
 
     def get_color(self, status: str) -> str:
         return {
@@ -234,18 +236,35 @@ class DayCell(QFrame):
         self.friends_data = friends_data
         self.goal_manager = goal_manager
 
-        self.setFrameShape(QFrame.Shape.StyledPanel)
-        self.setStyleSheet("""
-            QFrame {
-                border: 1px solid rgba(0,0,0,0.1);
-                border-radius: 12px;
-                background: #ffffff;
-            }
-            QFrame:hover {
-                border-color: rgba(0,0,0,0.15);
-                background: #f5f5f5;
-            }
-        """)
+        # Check if this is an out-of-month day
+        is_out_of_month = date_obj is None
+        
+        if is_out_of_month:
+            self.setFrameShape(QFrame.Shape.StyledPanel)
+            self.setStyleSheet("""
+                QFrame {
+                    border: 1px solid rgba(0,0,0,0.05);
+                    border-radius: 12px;
+                    background: #f5f5f5;
+                }
+                QFrame:hover {
+                    border-color: rgba(0,0,0,0.08);
+                    background: #eeeeee;
+                }
+            """)
+        else:
+            self.setFrameShape(QFrame.Shape.StyledPanel)
+            self.setStyleSheet("""
+                QFrame {
+                    border: 1px solid rgba(0,0,0,0.1);
+                    border-radius: 12px;
+                    background: #ffffff;
+                }
+                QFrame:hover {
+                    border-color: rgba(0,0,0,0.15);
+                    background: #f5f5f5;
+                }
+            """)
 
         layout = QVBoxLayout(self)
         layout.setContentsMargins(8, 8, 8, 7)
@@ -256,8 +275,12 @@ class DayCell(QFrame):
             header.setContentsMargins(0, 0, 0, 0)
             header.setSpacing(4)
             
-            if goal_manager:
-                status = goal_manager.get_status(date_obj, friends_data)
+            # Only show status if not in future
+            today = datetime.now()
+            is_future = date_obj.date() > today.date()
+            
+            if goal_manager and not is_future:
+                status = goal_manager.get_calendar_status(date_obj, friends_data)
                 color = goal_manager.get_color(status)
                 badge = QLabel(status)
                 badge.setStyleSheet(f"color: {color}; font-size: 11px; font-weight: 700;")
@@ -365,12 +388,14 @@ class CalendarPanel(QWidget):
         layout.addLayout(nav)
 
         # Legend
-        legend = QHBoxLayout()
+        legend_widget = QWidget()
+        legend = QHBoxLayout(legend_widget)
         legend.setContentsMargins(0, 0, 0, 0)
-        legend.setSpacing(12)
+        legend.setSpacing(8)
         lbl = QLabel("Status:")
         lbl.setStyleSheet("font-size: 13px; color: #888888; font-weight: 600;")
         legend.addWidget(lbl)
+        legend.addSpacing(8)
         
         for s, l in [("✓", "All done"), ("◐", "Some done"), ("✗", "None done")]:
             c = goal_manager.get_color(s) if goal_manager else "#888888"
@@ -381,9 +406,10 @@ class CalendarPanel(QWidget):
             n = QLabel(l)
             n.setStyleSheet("font-size: 12px; color: #999999;")
             legend.addWidget(n)
+            legend.addSpacing(16)
         
         legend.addStretch()
-        layout.addLayout(legend)
+        layout.addWidget(legend_widget)
 
         self.grid = QGridLayout()
         self.grid.setSpacing(6)
@@ -448,8 +474,9 @@ class CalendarPanel(QWidget):
 class DetailPanel(QWidget):
     """Detail panel."""
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, goal_manager=None):
         super().__init__(parent)
+        self.goal_manager = goal_manager
 
         layout = QVBoxLayout(self)
         layout.setContentsMargins(20, 0, 20, 0)
@@ -587,9 +614,15 @@ class DetailPanel(QWidget):
 
             rl.addLayout(il)
 
-            bg = "Done" if cnt > 0 else "Miss"
-            bc = "background: rgba(62,207,142,0.15); color: #3ecf8e;" if cnt > 0 else "background: rgba(0,0,0,0.05); color: #999999;"
-            bdg = QLabel(bg)
+            # Get status using goal_manager for this individual
+            status = self.goal_manager.get_status(date_obj, f) if self.goal_manager else "✗"
+            status_map = {
+                "✓": ("All done", "background: rgba(62,207,142,0.15); color: #3ecf8e;"),
+                "◐": ("Some done", "background: rgba(245,166,35,0.15); color: #f5a623;"),
+                "✗": ("None done", "background: rgba(248,113,113,0.15); color: #f87171;")
+            }
+            bg_text, bc = status_map.get(status, ("None done", "background: rgba(248,113,113,0.15); color: #f87171;"))
+            bdg = QLabel(bg_text)
             bdg.setStyleSheet(f"font-size: 10px; font-weight: 600; border-radius: 20px; padding: 3px 9px; text-transform: uppercase; {bc}")
             rl.addWidget(bdg)
 
@@ -694,7 +727,7 @@ class MainWindow(QDialog):
         self.cal.cell_clicked.connect(self._cell_click)
         cl.addWidget(self.cal)
 
-        self.det = DetailPanel(self)
+        self.det = DetailPanel(self, self.goal_manager)
         cl.addWidget(self.det)
 
         main.addWidget(cont)
