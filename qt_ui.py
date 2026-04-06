@@ -345,10 +345,22 @@ class CalendarPanel(QWidget):
 
         nav.addStretch()
 
-        today = QPushButton("Today")
-        today.setMaximumHeight(36)
-        today.clicked.connect(self._today)
-        nav.addWidget(today)
+        self.today_btn = QPushButton("Today")
+        self.today_btn.setMaximumHeight(40)
+        self.today_btn.setMinimumWidth(80)
+        self.today_btn.setStyleSheet("""
+            QPushButton {
+                background: #7c6af7;
+                color: white;
+                border: none;
+                border-radius: 6px;
+                font-weight: 500;
+                padding: 8px 16px;
+            }
+            QPushButton:hover { opacity: 0.85; }
+        """)
+        self.today_btn.clicked.connect(self._today)
+        nav.addWidget(self.today_btn)
 
         layout.addLayout(nav)
 
@@ -357,17 +369,17 @@ class CalendarPanel(QWidget):
         legend.setContentsMargins(0, 0, 0, 0)
         legend.setSpacing(12)
         lbl = QLabel("Status:")
-        lbl.setStyleSheet("font-size: 11px; color: #888888; font-weight: 500;")
+        lbl.setStyleSheet("font-size: 13px; color: #888888; font-weight: 600;")
         legend.addWidget(lbl)
         
         for s, l in [("✓", "All done"), ("◐", "Some done"), ("✗", "None done")]:
             c = goal_manager.get_color(s) if goal_manager else "#888888"
             b = QLabel(s)
-            b.setStyleSheet(f"color: {c}; font-size: 10px; font-weight: 700;")
-            b.setFixedSize(14, 14)
+            b.setStyleSheet(f"color: {c}; font-size: 14px; font-weight: 700;")
+            b.setFixedSize(18, 18)
             legend.addWidget(b)
             n = QLabel(l)
-            n.setStyleSheet("font-size: 10px; color: #999999;")
+            n.setStyleSheet("font-size: 12px; color: #999999;")
             legend.addWidget(n)
         
         legend.addStretch()
