@@ -609,6 +609,11 @@ class MainWindow(QDialog):
         self.user_color.clicked.connect(lambda: self._pick_color(self.user_color))
         uf.addRow("Color:", self.user_color)
 
+        self.repo_path = QLineEdit()
+        self.repo_path.setText(cfg.get("repo_path", ""))
+        self.repo_path.setPlaceholderText("/path/to/your/cloned/repo")
+        uf.addRow("Repo Path:", self.repo_path)
+
         upl.addLayout(uf)
         upl.addStretch()
         tabs.addTab(upt, "🧑 Profile")
@@ -720,14 +725,14 @@ class MainWindow(QDialog):
             }
             QPushButton:hover { opacity: 0.85; }
         """)
-        sv.clicked.connect(lambda: self._save(self.user_name.text(), self._color, ds.value(), ws.value(), d))
+        sv.clicked.connect(lambda: self._save(self.user_name.text(), self._color, self.repo_path.text(), ds.value(), ws.value(), d))
         btn_layout.addStretch()
         btn_layout.addWidget(sv)
         l.addLayout(btn_layout)
 
         d.exec()
 
-    def _save(self, name, color, daily, weekly, d):
+    def _save(self, name, color, repo_path, daily, weekly, d):
         if not name.strip():
             QMessageBox.warning(self, "Error", "Name cannot be empty!")
             return
@@ -735,6 +740,7 @@ class MainWindow(QDialog):
         cfg = mw.addonManager.getConfig(__name__) or {}
         cfg["my_name"] = name.strip()
         cfg["my_color"] = color
+        cfg["repo_path"] = repo_path.strip()
         cfg["goals"] = {"daily": daily, "weekly": weekly}
         _save_config(cfg)
         
