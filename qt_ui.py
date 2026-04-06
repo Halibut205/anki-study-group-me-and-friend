@@ -4,6 +4,7 @@ Simplified Study Tracker UI - Just calendar view + settings button.
 
 import json
 import time
+import os
 from datetime import datetime, timedelta
 from typing import Optional
 
@@ -16,6 +17,17 @@ from aqt.qt import (
 )
 
 from . import sync, tracker
+
+
+def _save_config(cfg: dict):
+    """Save config directly to config.json file."""
+    addon_dir = os.path.dirname(__file__)
+    config_path = os.path.join(addon_dir, "config.json")
+    try:
+        with open(config_path, "w") as f:
+            json.dump(cfg, f, indent=2)
+    except Exception as e:
+        print(f"Error saving config: {e}")
 
 
 class SyncWorker(QThread):
@@ -40,7 +52,7 @@ class GoalManager:
     def save_goals(self, daily: int, weekly: int):
         cfg = mw.addonManager.getConfig(__name__) or {}
         cfg["goals"] = {"daily": daily, "weekly": weekly}
-        mw.addonManager.update_config(cfg)
+        _save_config(cfg)
         self.goals = cfg.get("goals", {})
 
     def get_status(self, date_obj: datetime, friends_data: list) -> str:
@@ -724,7 +736,7 @@ class MainWindow(QDialog):
         cfg["my_name"] = name.strip()
         cfg["my_color"] = color
         cfg["goals"] = {"daily": daily, "weekly": weekly}
-        mw.addonManager.update_config(cfg)
+        _save_config(cfg)
         
         self.goal_manager.save_goals(daily, weekly)
         d.close()
