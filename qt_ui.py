@@ -30,6 +30,19 @@ def _save_config(cfg: dict):
         print(f"Error saving config: {e}")
 
 
+def _load_config() -> dict:
+    """Load config from config.json file."""
+    addon_dir = os.path.dirname(__file__)
+    config_path = os.path.join(addon_dir, "config.json")
+    try:
+        if os.path.exists(config_path):
+            with open(config_path, "r") as f:
+                return json.load(f)
+    except Exception as e:
+        print(f"Error loading config: {e}")
+    return {}
+
+
 class SyncWorker(QThread):
     """Background worker for git sync."""
     finished = pyqtSignal(bool, str)
@@ -79,6 +92,113 @@ class GoalManager:
             "✗": "#f87171",
             "·": "#cccccc",
         }.get(status, "#888888")
+
+
+class SetupWizard(QDialog):
+    """First time setup wizard."""
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Study Tracker - First Time Setup")
+        self.resize(500, 350)
+        self._color = "#378ADD"
+
+        l = QVBoxLayout(self)
+        l.setContentsMargins(30, 30, 30, 30)
+        l.setSpacing(16)
+
+        # Title
+        title = QLabel("👋 Welcome to Study Tracker!")
+        title.setStyleSheet("font-size: 16px; font-weight: 600; color: #000000;")
+        l.addWidget(title)
+
+        # Description
+        desc = QLabel("Let's set up your profile. You can change these anytime in Settings.")
+        desc.setStyleSheet("font-size: 12px; color: #888888;")
+        desc.setWordWrap(True)
+        l.addWidget(desc)
+
+        l.addSpacing(8)
+
+        # Form
+        f = QFormLayout()
+        f.setSpacing(12)
+
+        self.name = QLineEdit()
+        self.name.setPlaceholderText("Your name")
+        self.name.setText("Ban")
+        f.addRow("Name:", self.name)
+
+        color_layout = QHBoxLayout()
+        self.color_btn = QPushButton("🎨 #378ADD")
+        self.color_btn.setMaximumWidth(120)
+        self.color_btn.setStyleSheet("background: #378ADD; color: white; border: none; border-radius: 6px; padding: 6px;")
+        self.color_btn.clicked.connect(self._pick_color)
+        color_layout.addWidget(self.color_btn)
+        color_layout.addStretch()
+        f.addRow("Color:", color_layout)
+
+        self.repo_path = QLineEdit()
+        self.repo_path.setPlaceholderText("/path/to/your/cloned/repo")
+        f.addRow("Repo Path:", self.repo_path)
+
+        l.addLayout(f)
+        l.addStretch()
+
+        # Buttons
+        btn_layout = QHBoxLayout()
+        skip = QPushButton("⏭️ Skip")
+        skip.setStyleSheet("background: #f0f0f0; border: none; border-radius: 6px; padding: 8px 16px;")
+        skip.clicked.connect(self._save_default)
+        btn_layout.addWidget(skip)
+
+        save = QPushButton("✓ Save & Continue")
+        save.setStyleSheet("""
+            QPushButton {
+                background: #7c6af7;
+                border: none;
+                border-radius: 6px;
+                color: white;
+                font-weight: 500;
+                padding: 8px 16px;
+            }
+            QPushButton:hover { opacity: 0.85; }
+        """)
+        save.clicked.connect(self._save)
+        btn_layout.addWidget(save)
+        l.addLayout(btn_layout)
+
+    def _pick_color(self):
+        color = QColorDialog.getColor(initial=self._color, parent=self)
+        if color.isValid():
+            self._color = color.name()
+            self.color_btn.setText("🎨 " + self._color)
+            self.color_btn.setStyleSheet(f"background: {self._color}; color: white; border: none; border-radius: 6px; padding: 6px;")
+
+    def _save_default(self):
+        cfg = {
+            "my_name": "Ban",
+            "my_color": "#378ADD",
+            "repo_path": "",
+            "goals": {"daily": 10, "weekly": 50}
+        }
+        _save_config(cfg)
+        self.accept()
+
+    def _save(self):
+        name = self.name.text().strip()
+        if not name:
+            QMessageBox.warning(self, "Error", "Name cannot be empty!")
+            return
+
+        cfg = {
+            "my_name": name,
+            "my_color": self._color,
+            "repo_path": self.repo_path.text().strip(),
+            "goals": {"daily": 10, "weekly": 50}
+        }
+        _save_config(cfg)
+        self.accept()
 
 
 class DayCell(QFrame):
@@ -451,6 +571,12 @@ class MainWindow(QDialog):
         super().__init__(mw)
         self.setWindowTitle("Study Tracker")
         self.resize(1200, 700)
+
+        # Check if config needs setup
+        cfg = _load_config()
+        if not cfg or not cfg.get("my_name") or not cfg.get("my_color"):
+            wizard = SetupWizard(self)
+            wizard.exec()
 
         self.friends_data: list = []
         self.sync_worker: Optional[SyncWorker] = None
