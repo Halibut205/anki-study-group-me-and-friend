@@ -609,6 +609,11 @@ class MainWindow(QDialog):
         frl.addWidget(QLabel("👥 Friends"))
         frl.lastWidget().setStyleSheet("font-size: 13px; font-weight: 600; color: #000000;")
 
+        info = QLabel("Friends list from GitHub sync. Add friends via shared config on GitHub.")
+        info.setStyleSheet("font-size: 11px; color: #888888; margin-bottom: 12px;")
+        info.setWordWrap(True)
+        frl.addWidget(info)
+
         self.friend_list = QListWidget()
         self.friend_list.setStyleSheet("""QListWidget { border: 1px solid #ddd; border-radius: 6px; }""")
         for f in self.friends_data:
@@ -618,13 +623,7 @@ class MainWindow(QDialog):
                 self.friend_list.addItem(item)
         frl.addWidget(self.friend_list)
 
-        fbtn = QHBoxLayout()
-        fadd = QPushButton("➕ Add Friend")
-        fadd.setStyleSheet("""QPushButton { background: #7c6af7; color: white; border: none; border-radius: 6px; padding: 8px; font-weight: 500; }""")
-        fadd.clicked.connect(lambda: self._add_friend())
-        fbtn.addWidget(fadd)
-        fbtn.addStretch()
-        frl.addLayout(fbtn)
+        frl.addStretch()
         tabs.addTab(frt, "👥 Friends")
 
         # TAB 3: Goals
@@ -748,70 +747,6 @@ class MainWindow(QDialog):
             btn.setText("🎨 " + hex_color)
             btn.setStyleSheet(f"background: {hex_color}; color: white; border: none; border-radius: 6px; padding: 6px;")
             self._color = hex_color
-
-    def _add_friend(self):
-        d = QDialog(self)
-        d.setWindowTitle("Add Friend")
-        d.setGeometry(100, 100, 400, 150)
-        
-        l = QVBoxLayout(d)
-        l.setContentsMargins(20, 20, 20, 20)
-        l.setSpacing(12)
-
-        l.addWidget(QLabel("Friend Name:"))
-        fn = QLineEdit()
-        fn.setPlaceholderText("Friend name")
-        l.addWidget(fn)
-
-        l.addWidget(QLabel("Color:"))
-        fc = QPushButton("🎨 #378ADD")
-        fc.setMaximumWidth(120)
-        fc.setStyleSheet("background: #378ADD; color: white; border: none; border-radius: 6px; padding: 6px;")
-        fc_val = "#378ADD"
-        def pick():
-            nonlocal fc_val
-            color = QColorDialog.getColor(initial=fc_val, parent=d)
-            if color.isValid():
-                fc_val = color.name()
-                fc.setText("🎨 " + fc_val)
-                fc.setStyleSheet(f"background: {fc_val}; color: white; border: none; border-radius: 6px; padding: 6px;")
-        fc.clicked.connect(pick)
-        l.addWidget(fc)
-
-        l.addStretch()
-
-        btn = QHBoxLayout()
-        ok = QPushButton("Add")
-        ok.setStyleSheet("background: #7c6af7; color: white; border: none; border-radius: 6px; padding: 8px; font-weight: 500;")
-        ok.clicked.connect(lambda: self._save_friend(fn.text(), fc_val, d) if fn.text().strip() else QMessageBox.warning(d, "Error", "Name required!"))
-        cancel = QPushButton("Cancel")
-        cancel.setStyleSheet("background: #f0f0f0; border: none; border-radius: 6px; padding: 8px;")
-        cancel.clicked.connect(d.close)
-        btn.addStretch()
-        btn.addWidget(ok)
-        btn.addWidget(cancel)
-        l.addLayout(btn)
-
-        d.exec()
-
-    def _save_friend(self, name, color, d):
-        cfg = mw.addonManager.getConfig(__name__) or {}
-        friends = cfg.get("friends", [])
-        
-        if not isinstance(friends, list):
-            friends = []
-        
-        for f in friends:
-            if f.get("name") == name:
-                QMessageBox.warning(d, "Error", "Friend already exists!")
-                return
-        
-        friends.append({"name": name.strip(), "color": color})
-        cfg["friends"] = friends
-        mw.addonManager.setConfig(__name__, cfg)
-        
-        d.close()
-        QMessageBox.information(self, "Study Tracker", f"✓ Added {name}!")
 
     def _sync(self):
         self.sync_btn.setEnabled(False)
