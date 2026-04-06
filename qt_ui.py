@@ -11,7 +11,8 @@ from aqt import mw
 from aqt.qt import (
     QDialog, QVBoxLayout, QHBoxLayout, QWidget, QPushButton, QLabel,
     QGridLayout, QScrollArea, QFrame, Qt, QMessageBox,
-    QThread, pyqtSignal, QSpinBox, QFormLayout
+    QThread, pyqtSignal, QSpinBox, QFormLayout, QLineEdit,
+    QColorDialog, QTabWidget, QListWidget, QListWidgetItem
 )
 
 from . import sync, tracker
@@ -560,41 +561,112 @@ class MainWindow(QDialog):
     def _settings(self):
         d = QDialog(self)
         d.setWindowTitle("Settings")
-        d.setGeometry(100, 100, 380, 280)
+        d.resize(500, 450)
         
         l = QVBoxLayout(d)
-        l.setSpacing(16)
-        l.setContentsMargins(20, 20, 20, 20)
+        l.setContentsMargins(0, 0, 0, 0)
+        l.setSpacing(0)
 
-        tit = QLabel("📊 Study Goals")
-        tit.setStyleSheet("font-size: 13px; font-weight: 600; color: #000000;")
-        l.addWidget(tit)
+        tabs = QTabWidget()
+        tabs.setStyleSheet("""QTabBar::tab { padding: 8px 16px; }""")
 
-        f = QFormLayout()
+        # TAB 1: User Profile
+        upt = QWidget()
+        upl = QVBoxLayout(upt)
+        upl.setContentsMargins(20, 20, 20, 20)
+        upl.setSpacing(12)
+
+        cfg = mw.addonManager.getConfig(__name__) or {}
+        upl.addWidget(QLabel("🧑 Your Profile"))
+        upl.lastWidget().setStyleSheet("font-size: 13px; font-weight: 600; color: #000000;")
+
+        uf = QFormLayout()
+        uf.setSpacing(10)
+        self.user_name = QLineEdit()
+        self.user_name.setText(cfg.get("my_name", "Me"))
+        self.user_name.setPlaceholderText("Your name")
+        uf.addRow("Name:", self.user_name)
+
+        self.user_color = QPushButton("🎨 " + cfg.get("my_color", "#378ADD"))
+        self.user_color.setMaximumWidth(120)
+        self.user_color.setStyleSheet(f"background: {cfg.get('my_color', '#378ADD')}; color: white; border: none; border-radius: 6px; padding: 6px;")
+        self.user_color.setData = lambda role, val: setattr(self, '_color', val) if role == Qt.ItemDataRole.UserRole else None
+        self.user_color.data = lambda role: getattr(self, '_color', cfg.get('my_color', '#378ADD')) if role == Qt.ItemDataRole.UserRole else None
+        self._color = cfg.get("my_color", "#378ADD")
+        self.user_color.clicked.connect(lambda: self._pick_color(self.user_color))
+        uf.addRow("Color:", self.user_color)
+
+        upl.addLayout(uf)
+        upl.addStretch()
+        tabs.addTab(upt, "🧑 Profile")
+
+        # TAB 2: Friends
+        frt = QWidget()
+        frl = QVBoxLayout(frt)
+        frl.setContentsMargins(20, 20, 20, 20)
+        frl.setSpacing(12)
+
+        frl.addWidget(QLabel("👥 Friends"))
+        frl.lastWidget().setStyleSheet("font-size: 13px; font-weight: 600; color: #000000;")
+
+        self.friend_list = QListWidget()
+        self.friend_list.setStyleSheet("""QListWidget { border: 1px solid #ddd; border-radius: 6px; }""")
+        for f in self.friends_data:
+            if f.get("name") != cfg.get("my_name", "Me"):
+                item = QListWidgetItem(f"🟢 {f.get('name', '?')}")
+                item.setData(Qt.ItemDataRole.UserRole, f.get("color", "#378ADD"))
+                self.friend_list.addItem(item)
+        frl.addWidget(self.friend_list)
+
+        fbtn = QHBoxLayout()
+        fadd = QPushButton("➕ Add Friend")
+        fadd.setStyleSheet("""QPushButton { background: #7c6af7; color: white; border: none; border-radius: 6px; padding: 8px; font-weight: 500; }""")
+        fadd.clicked.connect(lambda: self._add_friend())
+        fbtn.addWidget(fadd)
+        fbtn.addStretch()
+        frl.addLayout(fbtn)
+        tabs.addTab(frt, "👥 Friends")
+
+        # TAB 3: Goals
+        got = QWidget()
+        gol = QVBoxLayout(got)
+        gol.setContentsMargins(20, 20, 20, 20)
+        gol.setSpacing(12)
+
+        gol.addWidget(QLabel("📊 Study Goals"))
+        gol.lastWidget().setStyleSheet("font-size: 13px; font-weight: 600; color: #000000;")
+
+        gf = QFormLayout()
+        gf.setSpacing(10)
         ds = QSpinBox()
         ds.setMinimum(1)
         ds.setMaximum(500)
         ds.setValue(self.goal_manager.goals.get("daily", 10))
-        f.addRow("Daily:", ds)
+        gf.addRow("Daily:", ds)
 
         ws = QSpinBox()
         ws.setMinimum(1)
         ws.setMaximum(5000)
         ws.setValue(self.goal_manager.goals.get("weekly", 50))
-        f.addRow("Weekly:", ws)
+        gf.addRow("Weekly:", ws)
 
-        l.addLayout(f)
+        gol.addLayout(gf)
+        gol.addStretch()
+        tabs.addTab(got, "📊 Goals")
 
-        div = QFrame()
-        div.setFrameShape(QFrame.Shape.HLine)
-        div.setStyleSheet("color: rgba(0,0,0,0.1);")
-        l.addWidget(div)
+        # TAB 4: Data
+        drt = QWidget()
+        drl = QVBoxLayout(drt)
+        drl.setContentsMargins(20, 20, 20, 20)
+        drl.setSpacing(12)
 
-        dt = QLabel("🗑️ Data")
-        dt.setStyleSheet("font-size: 13px; font-weight: 600; color: #000000;")
-        l.addWidget(dt)
+        drl.addWidget(QLabel("🗑️ Data Management"))
+        drl.lastWidget().setStyleSheet("font-size: 13px; font-weight: 600; color: #000000;")
 
-        clr = QPushButton("Clear All Data")
+        drl.addWidget(QLabel("Danger Zone"))
+        drl.lastWidget().setStyleSheet("font-size: 11px; color: #f87171; font-weight: 600; margin-top: 8px;")
+
+        clr = QPushButton("Clear All Study Data")
         clr.setStyleSheet("""
             QPushButton {
                 background: #f87171;
@@ -607,9 +679,17 @@ class MainWindow(QDialog):
             QPushButton:hover { opacity: 0.85; }
         """)
         clr.clicked.connect(lambda: self._clear(d))
-        l.addWidget(clr)
+        drl.addWidget(clr)
 
-        l.addStretch()
+        drl.addStretch()
+        tabs.addTab(drt, "🗑️ Data")
+
+        l.addWidget(tabs)
+
+        # Bottom buttons
+        btn_layout = QHBoxLayout()
+        btn_layout.setContentsMargins(20, 20, 20, 20)
+        btn_layout.setSpacing(12)
 
         sv = QPushButton("💾 Save")
         sv.setStyleSheet("""
@@ -619,18 +699,34 @@ class MainWindow(QDialog):
                 border-radius: 6px;
                 color: white;
                 font-weight: 500;
-                padding: 10px;
+                padding: 10px 16px;
+                min-width: 100px;
             }
             QPushButton:hover { opacity: 0.85; }
         """)
-        sv.clicked.connect(lambda: self._save(ds.value(), ws.value(), d))
-        l.addWidget(sv)
+        sv.clicked.connect(lambda: self._save(self.user_name.text(), self._color, ds.value(), ws.value(), d))
+        btn_layout.addStretch()
+        btn_layout.addWidget(sv)
+        l.addLayout(btn_layout)
 
         d.exec()
 
-    def _save(self, daily, weekly, d):
+    def _save(self, name, color, daily, weekly, d):
+        if not name.strip():
+            QMessageBox.warning(self, "Error", "Name cannot be empty!")
+            return
+        
+        cfg = mw.addonManager.getConfig(__name__) or {}
+        cfg["my_name"] = name.strip()
+        cfg["my_color"] = color
+        cfg["goals"] = {"daily": daily, "weekly": weekly}
+        mw.addonManager.setConfig(__name__, cfg)
+        
         self.goal_manager.save_goals(daily, weekly)
         d.close()
+        
+        # Update display
+        self._load()
         QMessageBox.information(self, "Study Tracker", "✓ Saved!")
 
     def _clear(self, d):
@@ -643,6 +739,79 @@ class MainWindow(QDialog):
                     QMessageBox.information(self, "Study Tracker", "✓ Cleared!")
             except Exception as e:
                 QMessageBox.critical(self, "Error", f"Failed:\n{str(e)}")
+
+    def _pick_color(self, btn):
+        cfg = mw.addonManager.getConfig(__name__) or {}
+        color = QColorDialog.getColor(initial=cfg.get("my_color", "#378ADD"), parent=self)
+        if color.isValid():
+            hex_color = color.name()
+            btn.setText("🎨 " + hex_color)
+            btn.setStyleSheet(f"background: {hex_color}; color: white; border: none; border-radius: 6px; padding: 6px;")
+            self._color = hex_color
+
+    def _add_friend(self):
+        d = QDialog(self)
+        d.setWindowTitle("Add Friend")
+        d.setGeometry(100, 100, 400, 150)
+        
+        l = QVBoxLayout(d)
+        l.setContentsMargins(20, 20, 20, 20)
+        l.setSpacing(12)
+
+        l.addWidget(QLabel("Friend Name:"))
+        fn = QLineEdit()
+        fn.setPlaceholderText("Friend name")
+        l.addWidget(fn)
+
+        l.addWidget(QLabel("Color:"))
+        fc = QPushButton("🎨 #378ADD")
+        fc.setMaximumWidth(120)
+        fc.setStyleSheet("background: #378ADD; color: white; border: none; border-radius: 6px; padding: 6px;")
+        fc_val = "#378ADD"
+        def pick():
+            nonlocal fc_val
+            color = QColorDialog.getColor(initial=fc_val, parent=d)
+            if color.isValid():
+                fc_val = color.name()
+                fc.setText("🎨 " + fc_val)
+                fc.setStyleSheet(f"background: {fc_val}; color: white; border: none; border-radius: 6px; padding: 6px;")
+        fc.clicked.connect(pick)
+        l.addWidget(fc)
+
+        l.addStretch()
+
+        btn = QHBoxLayout()
+        ok = QPushButton("Add")
+        ok.setStyleSheet("background: #7c6af7; color: white; border: none; border-radius: 6px; padding: 8px; font-weight: 500;")
+        ok.clicked.connect(lambda: self._save_friend(fn.text(), fc_val, d) if fn.text().strip() else QMessageBox.warning(d, "Error", "Name required!"))
+        cancel = QPushButton("Cancel")
+        cancel.setStyleSheet("background: #f0f0f0; border: none; border-radius: 6px; padding: 8px;")
+        cancel.clicked.connect(d.close)
+        btn.addStretch()
+        btn.addWidget(ok)
+        btn.addWidget(cancel)
+        l.addLayout(btn)
+
+        d.exec()
+
+    def _save_friend(self, name, color, d):
+        cfg = mw.addonManager.getConfig(__name__) or {}
+        friends = cfg.get("friends", [])
+        
+        if not isinstance(friends, list):
+            friends = []
+        
+        for f in friends:
+            if f.get("name") == name:
+                QMessageBox.warning(d, "Error", "Friend already exists!")
+                return
+        
+        friends.append({"name": name.strip(), "color": color})
+        cfg["friends"] = friends
+        mw.addonManager.setConfig(__name__, cfg)
+        
+        d.close()
+        QMessageBox.information(self, "Study Tracker", f"✓ Added {name}!")
 
     def _sync(self):
         self.sync_btn.setEnabled(False)
