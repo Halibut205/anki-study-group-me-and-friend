@@ -144,7 +144,7 @@ class DayCell(QFrame):
 class CalendarPanel(QWidget):
     """Left panel with calendar grid."""
 
-    cell_clicked = pyqtSignal(Optional[datetime])
+    cell_clicked = pyqtSignal(object)  # emits datetime or None
 
     def __init__(self, friends_data: list, parent=None):
         super().__init__(parent)
