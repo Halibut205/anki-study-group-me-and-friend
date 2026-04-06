@@ -785,35 +785,7 @@ class MainWindow(QDialog):
         frl.addStretch()
         tabs.addTab(frt, "👥 Friends")
 
-        # TAB 3: Goals
-        got = QWidget()
-        gol = QVBoxLayout(got)
-        gol.setContentsMargins(20, 20, 20, 20)
-        gol.setSpacing(12)
-
-        goals_title = QLabel("📊 Study Goals")
-        goals_title.setStyleSheet("font-size: 13px; font-weight: 600; color: #000000;")
-        gol.addWidget(goals_title)
-
-        gf = QFormLayout()
-        gf.setSpacing(10)
-        ds = QSpinBox()
-        ds.setMinimum(1)
-        ds.setMaximum(500)
-        ds.setValue(self.goal_manager.goals.get("daily", 10))
-        gf.addRow("Daily:", ds)
-
-        ws = QSpinBox()
-        ws.setMinimum(1)
-        ws.setMaximum(5000)
-        ws.setValue(self.goal_manager.goals.get("weekly", 50))
-        gf.addRow("Weekly:", ws)
-
-        gol.addLayout(gf)
-        gol.addStretch()
-        tabs.addTab(got, "📊 Goals")
-
-        # TAB 4: Data
+        # TAB 3: Data
         drt = QWidget()
         drl = QVBoxLayout(drt)
         drl.setContentsMargins(20, 20, 20, 20)
@@ -865,14 +837,14 @@ class MainWindow(QDialog):
             }
             QPushButton:hover { opacity: 0.85; }
         """)
-        sv.clicked.connect(lambda: self._save(self.user_name.text(), self._color, ds.value(), ws.value(), d))
+        sv.clicked.connect(lambda: self._save(self.user_name.text(), self._color, d))
         btn_layout.addStretch()
         btn_layout.addWidget(sv)
         l.addLayout(btn_layout)
 
         d.exec()
 
-    def _save(self, name, color, daily, weekly, d):
+    def _save(self, name, color, d):
         if not name.strip():
             QMessageBox.warning(self, "Error", "Name cannot be empty!")
             return
@@ -881,9 +853,6 @@ class MainWindow(QDialog):
         cfg["my_name"] = name.strip()
         cfg["my_color"] = color
         _save_config(cfg)
-        
-        # Save shared goals
-        self.goal_manager.save_goals(daily, weekly)
         d.close()
         
         # Update display
