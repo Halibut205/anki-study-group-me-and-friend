@@ -577,8 +577,9 @@ class MainWindow(QDialog):
         upl.setSpacing(12)
 
         cfg = mw.addonManager.getConfig(__name__) or {}
-        upl.addWidget(QLabel("🧑 Your Profile"))
-        upl.lastWidget().setStyleSheet("font-size: 13px; font-weight: 600; color: #000000;")
+        title = QLabel("🧑 Your Profile")
+        title.setStyleSheet("font-size: 13px; font-weight: 600; color: #000000;")
+        upl.addWidget(title)
 
         uf = QFormLayout()
         uf.setSpacing(10)
@@ -606,8 +607,9 @@ class MainWindow(QDialog):
         frl.setContentsMargins(20, 20, 20, 20)
         frl.setSpacing(12)
 
-        frl.addWidget(QLabel("👥 Friends"))
-        frl.lastWidget().setStyleSheet("font-size: 13px; font-weight: 600; color: #000000;")
+        friends_title = QLabel("👥 Friends")
+        friends_title.setStyleSheet("font-size: 13px; font-weight: 600; color: #000000;")
+        frl.addWidget(friends_title)
 
         info = QLabel("Friends list from GitHub sync. Add friends via shared config on GitHub.")
         info.setStyleSheet("font-size: 11px; color: #888888; margin-bottom: 12px;")
@@ -632,8 +634,9 @@ class MainWindow(QDialog):
         gol.setContentsMargins(20, 20, 20, 20)
         gol.setSpacing(12)
 
-        gol.addWidget(QLabel("📊 Study Goals"))
-        gol.lastWidget().setStyleSheet("font-size: 13px; font-weight: 600; color: #000000;")
+        goals_title = QLabel("📊 Study Goals")
+        goals_title.setStyleSheet("font-size: 13px; font-weight: 600; color: #000000;")
+        gol.addWidget(goals_title)
 
         gf = QFormLayout()
         gf.setSpacing(10)
@@ -659,11 +662,13 @@ class MainWindow(QDialog):
         drl.setContentsMargins(20, 20, 20, 20)
         drl.setSpacing(12)
 
-        drl.addWidget(QLabel("🗑️ Data Management"))
-        drl.lastWidget().setStyleSheet("font-size: 13px; font-weight: 600; color: #000000;")
+        data_title = QLabel("🗑️ Data Management")
+        data_title.setStyleSheet("font-size: 13px; font-weight: 600; color: #000000;")
+        drl.addWidget(data_title)
 
-        drl.addWidget(QLabel("Danger Zone"))
-        drl.lastWidget().setStyleSheet("font-size: 11px; color: #f87171; font-weight: 600; margin-top: 8px;")
+        danger_title = QLabel("Danger Zone")
+        danger_title.setStyleSheet("font-size: 11px; color: #f87171; font-weight: 600; margin-top: 8px;")
+        drl.addWidget(danger_title)
 
         clr = QPushButton("Clear All Study Data")
         clr.setStyleSheet("""
