@@ -142,12 +142,12 @@ class SetupWizard(QDialog):
 
         # Title
         title = QLabel("👋 Welcome to Study Tracker!")
-        title.setStyleSheet("font-size: 16px; font-weight: 600; color: #000000;")
+        title.setStyleSheet("font-size: 16px; font-weight: 700; color: #000000;")
         l.addWidget(title)
 
         # Description
         desc = QLabel("Let's set up your profile. You can change these anytime in Settings.")
-        desc.setStyleSheet("font-size: 12px; color: #888888;")
+        desc.setStyleSheet("font-size: 12px; font-weight: 500; color: #888888;")
         desc.setWordWrap(True)
         l.addWidget(desc)
 
@@ -188,7 +188,7 @@ class SetupWizard(QDialog):
                 border: none;
                 border-radius: 6px;
                 color: white;
-                font-weight: 500;
+                font-weight: 600;
                 padding: 8px 16px;
             }
             QPushButton:hover { opacity: 0.85; }
@@ -288,7 +288,7 @@ class DayCell(QFrame):
                 header.addWidget(badge)
             
             day = QLabel(str(date_obj.day))
-            day.setStyleSheet("color: #666666; font-size: 12px; font-weight: 500; font-family: 'Courier New', monospace;")
+            day.setStyleSheet("color: #666666; font-size: 12px; font-weight: 600; font-family: 'Courier New', monospace;")
             header.addWidget(day)
             header.addStretch()
             layout.addLayout(header)
@@ -362,7 +362,7 @@ class CalendarPanel(QWidget):
         nav.addWidget(next_btn)
 
         self.month = QLabel()
-        self.month.setStyleSheet("font-size: 22px; font-weight: 600;")
+        self.month.setStyleSheet("font-size: 22px; font-weight: 700;")
         self.month.setAlignment(Qt.AlignmentFlag.AlignCenter)
         nav.addWidget(self.month)
 
@@ -377,7 +377,7 @@ class CalendarPanel(QWidget):
                 color: white;
                 border: none;
                 border-radius: 6px;
-                font-weight: 500;
+                font-weight: 600;
                 padding: 8px 16px;
             }
             QPushButton:hover { opacity: 0.85; }
@@ -393,7 +393,7 @@ class CalendarPanel(QWidget):
         legend.setContentsMargins(0, 0, 0, 0)
         legend.setSpacing(8)
         lbl = QLabel("Status:")
-        lbl.setStyleSheet("font-size: 13px; color: #888888; font-weight: 600;")
+        lbl.setStyleSheet("font-size: 13px; color: #888888; font-weight: 700;")
         legend.addWidget(lbl)
         legend.addSpacing(8)
         
@@ -404,7 +404,7 @@ class CalendarPanel(QWidget):
             b.setFixedSize(18, 18)
             legend.addWidget(b)
             n = QLabel(l)
-            n.setStyleSheet("font-size: 12px; color: #999999;")
+            n.setStyleSheet("font-size: 12px; font-weight: 500; color: #999999;")
             legend.addWidget(n)
             legend.addSpacing(16)
         
@@ -418,7 +418,7 @@ class CalendarPanel(QWidget):
         for i, day in enumerate(days):
             hdr = QLabel(day)
             hdr.setAlignment(Qt.AlignmentFlag.AlignCenter)
-            hdr.setStyleSheet("color: #888888; font-size: 11px; font-weight: 500; text-transform: uppercase;")
+            hdr.setStyleSheet("color: #888888; font-size: 11px; font-weight: 600; text-transform: uppercase;")
             self.grid.addWidget(hdr, 0, i)
 
         layout.addLayout(self.grid)
@@ -483,7 +483,7 @@ class DetailPanel(QWidget):
 
         self.empty = QLabel("Select a day")
         self.empty.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.empty.setStyleSheet("color: #999999; font-size: 13px;")
+        self.empty.setStyleSheet("color: #999999; font-size: 13px; font-weight: 500;")
 
         layout.addSpacing(24)
         layout.addWidget(self.empty)
@@ -511,11 +511,11 @@ class DetailPanel(QWidget):
         w_str = date_obj.strftime("%A")
 
         date_lbl = QLabel(d_str)
-        date_lbl.setStyleSheet("font-size: 13px; font-weight: 600; color: #000000;")
+        date_lbl.setStyleSheet("font-size: 13px; font-weight: 700; color: #000000;")
         layout.addWidget(date_lbl)
 
         week_lbl = QLabel(w_str)
-        week_lbl.setStyleSheet("font-size: 11px; color: #888888; margin-top: 2px;")
+        week_lbl.setStyleSheet("font-size: 11px; font-weight: 500; color: #888888; margin-top: 2px;")
         layout.addWidget(week_lbl)
 
         layout.addSpacing(12)
@@ -532,9 +532,9 @@ class DetailPanel(QWidget):
         s1l = QVBoxLayout(s1)
         s1l.setContentsMargins(8, 8, 8, 8)
         s1v = QLabel(str(studied))
-        s1v.setStyleSheet("font-size: 18px; font-weight: 600; color: #000000; font-family: 'Courier New';")
+        s1v.setStyleSheet("font-size: 18px; font-weight: 700; color: #000000; font-family: 'Courier New';")
         s1k = QLabel("STUDIED")
-        s1k.setStyleSheet("font-size: 10px; color: #888888; margin-top: 2px; text-transform: uppercase;")
+        s1k.setStyleSheet("font-size: 10px; font-weight: 600; color: #888888; margin-top: 2px; text-transform: uppercase;")
         s1l.addWidget(s1v)
         s1l.addWidget(s1k)
         stats.addWidget(s1)
@@ -544,9 +544,9 @@ class DetailPanel(QWidget):
         s2l = QVBoxLayout(s2)
         s2l.setContentsMargins(8, 8, 8, 8)
         s2v = QLabel(str(total))
-        s2v.setStyleSheet("font-size: 18px; font-weight: 600; color: #000000; font-family: 'Courier New';")
+        s2v.setStyleSheet("font-size: 18px; font-weight: 700; color: #000000; font-family: 'Courier New';")
         s2k = QLabel("TOTAL")
-        s2k.setStyleSheet("font-size: 10px; color: #888888; margin-top: 2px; text-transform: uppercase;")
+        s2k.setStyleSheet("font-size: 10px; font-weight: 600; color: #888888; margin-top: 2px; text-transform: uppercase;")
         s2l.addWidget(s2v)
         s2l.addWidget(s2k)
         stats.addWidget(s2)
@@ -604,12 +604,12 @@ class DetailPanel(QWidget):
             il.setSpacing(2)
 
             nm = QLabel(f.get("name", "Unknown"))
-            nm.setStyleSheet("font-size: 13px; font-weight: 500; color: #000000;")
+            nm.setStyleSheet("font-size: 13px; font-weight: 600; color: #000000;")
             il.addWidget(nm)
 
             cnt = f.get("reviews", {}).get(d_str, 0)
             ct = QLabel(f"{cnt} cards" if cnt > 0 else "—")
-            ct.setStyleSheet("font-size: 11px; color: #888888; font-family: 'Courier New';")
+            ct.setStyleSheet("font-size: 11px; font-weight: 500; color: #888888; font-family: 'Courier New';")
             il.addWidget(ct)
 
             rl.addLayout(il)
@@ -623,7 +623,7 @@ class DetailPanel(QWidget):
             }
             bg_text, bc = status_map.get(status, ("None done", "background: rgba(248,113,113,0.15); color: #f87171;"))
             bdg = QLabel(bg_text)
-            bdg.setStyleSheet(f"font-size: 10px; font-weight: 600; border-radius: 20px; padding: 3px 9px; text-transform: uppercase; {bc}")
+            bdg.setStyleSheet(f"font-size: 10px; font-weight: 700; border-radius: 20px; padding: 3px 9px; text-transform: uppercase; {bc}")
             rl.addWidget(bdg)
 
             sl.addWidget(row)
@@ -666,19 +666,19 @@ class MainWindow(QDialog):
         tit.setContentsMargins(0, 0, 0, 0)
         tit.setSpacing(1)
         title = QLabel("Study Tracker")
-        title.setStyleSheet("font-size: 15px; font-weight: 600; color: #000000;")
+        title.setStyleSheet("font-size: 15px; font-weight: 700; color: #000000;")
         tit.addWidget(title)
         
         cfg = mw.addonManager.getConfig(__name__) or {}
         sub = QLabel(f"{cfg.get('my_name', 'Me')}")
-        sub.setStyleSheet("font-size: 12px; color: #888888; font-family: 'Courier New';")
+        sub.setStyleSheet("font-size: 12px; font-weight: 500; color: #888888; font-family: 'Courier New';")
         tit.addWidget(sub)
         
         # Show goals
         daily_goal = self.goal_manager.goals.get("daily", 60)
         weekly_goal = self.goal_manager.goals.get("weekly", 420)
         goals_text = QLabel(f"Daily: {daily_goal} | Weekly: {weekly_goal}")
-        goals_text.setStyleSheet("font-size: 11px; color: #7c6af7; font-weight: 500;")
+        goals_text.setStyleSheet("font-size: 11px; color: #7c6af7; font-weight: 600;")
         tit.addWidget(goals_text)
         
         tl.addLayout(tit)
@@ -692,7 +692,7 @@ class MainWindow(QDialog):
                 border: none;
                 border-radius: 8px;
                 color: white;
-                font-weight: 500;
+                font-weight: 600;
                 font-size: 13px;
                 padding: 8px 14px;
             }
@@ -790,7 +790,7 @@ class MainWindow(QDialog):
 
         cfg = mw.addonManager.getConfig(__name__) or {}
         title = QLabel("🧑 Your Profile")
-        title.setStyleSheet("font-size: 13px; font-weight: 600; color: #000000;")
+        title.setStyleSheet("font-size: 13px; font-weight: 700; color: #000000;")
         upl.addWidget(title)
 
         uf = QFormLayout()
@@ -820,7 +820,7 @@ class MainWindow(QDialog):
         frl.setSpacing(12)
 
         friends_title = QLabel("👥 Friends")
-        friends_title.setStyleSheet("font-size: 13px; font-weight: 600; color: #000000;")
+        friends_title.setStyleSheet("font-size: 13px; font-weight: 700; color: #000000;")
         frl.addWidget(friends_title)
 
         info = QLabel("Friends list from GitHub sync. Add friends via shared config on GitHub.")
@@ -847,11 +847,11 @@ class MainWindow(QDialog):
         drl.setSpacing(12)
 
         data_title = QLabel("🗑️ Data Management")
-        data_title.setStyleSheet("font-size: 13px; font-weight: 600; color: #000000;")
+        data_title.setStyleSheet("font-size: 13px; font-weight: 700; color: #000000;")
         drl.addWidget(data_title)
 
         danger_title = QLabel("Danger Zone")
-        danger_title.setStyleSheet("font-size: 11px; color: #f87171; font-weight: 600; margin-top: 8px;")
+        danger_title.setStyleSheet("font-size: 11px; color: #f87171; font-weight: 700; margin-top: 8px;")
         drl.addWidget(danger_title)
 
         clr = QPushButton("Clear All Study Data")
@@ -861,7 +861,7 @@ class MainWindow(QDialog):
                 border: none;
                 border-radius: 6px;
                 color: white;
-                font-weight: 500;
+                font-weight: 600;
                 padding: 8px;
             }
             QPushButton:hover { opacity: 0.85; }
@@ -886,7 +886,7 @@ class MainWindow(QDialog):
                 border: none;
                 border-radius: 6px;
                 color: white;
-                font-weight: 500;
+                font-weight: 600;
                 padding: 10px 16px;
                 min-width: 100px;
             }
